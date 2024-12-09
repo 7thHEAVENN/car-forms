@@ -1,0 +1,215 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Car Reviews</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* General Body Styling */
+        body {
+            background-color: #000; /* Solid black background */
+            color: #fff; /* White text for readability */
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Container Styling */
+        .container {
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 30px;
+            background-color: #111; /* Dark gray for the container */
+            border-radius: 10px;
+            box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Heading Styling */
+        h1, h3 {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #fff; /* White text */
+        }
+
+        h1 {
+            font-size: 2.5rem;
+        }
+
+        h3 {
+            font-size: 1.8rem;
+        }
+
+        /* Review Card Styling */
+        .review-card {
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #222; /* Slightly lighter black for contrast */
+            border: 1px solid #333; /* Light border for definition */
+            border-radius: 8px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.5);
+            color: #fff; /* White text */
+        }
+
+        .review-card h2 {
+            font-size: 1.8rem;
+            color: #fff; /* White for standout car model title */
+            margin-bottom: 10px;
+        }
+
+        /* Button Styling */
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            font-size: 1.2rem;
+            background-color: #000; /* Black button */
+            border: 1px solid #fff; /* White border */
+            border-radius: 5px;
+            color: #fff; /* White text */
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+        }
+
+        button:hover {
+            background-color: #333; /* Dark gray on hover */
+            transform: scale(1.03);
+            box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.7);
+        }
+
+        /* List Styling */
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        ul li {
+            padding: 10px;
+            margin-bottom: 8px;
+            background-color: #222; /* Slightly lighter black */
+            border: 1px solid #333; /* Light border for contrast */
+            border-radius: 5px;
+            font-size: 1.1rem;
+        }
+
+        ul li:hover {
+            background-color: #333; /* Slight hover effect */
+            cursor: pointer;
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            padding: 15px;
+            background-color: #000; /* Solid black navbar */
+            border-bottom: 1px solid #333; /* Bottom border for distinction */
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff; /* White text */
+        }
+
+        .navbar-nav .nav-link {
+            color: #fff !important;
+            font-weight: bold;
+            margin-right: 15px;
+            transition: color 0.3s;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #ddd !important; /* Light gray on hover */
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            h3 {
+                font-size: 1.5rem;
+            }
+
+            button {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body style="background-image: url("student_project/student_app/static/images/dnd.jpeg"); background-size: cover; background-repeat: no-repeat; background-attachment: fixed;">
+    
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Car Review Site</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'home' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'service' %}">Service</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-link nav-link" style="padding:0; background:none; border:none; color:inherit; cursor:pointer;">
+                                    Logout
+                                </button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h1>Car Reviews</h1>
+        {% if review %}
+            <div class="review-card">
+                <h2>Car Model: {{ review.car_model }}</h2>
+                <p><strong>Reviewer:</strong> {{ review.reviewer_name }}</p>
+                <p><strong>Rating:</strong> {{ review.rating }}</p>
+                <p><strong>Review:</strong> {{ review.review_text }}</p>
+            </div>
+        {% else %}
+            <p class="text-center">No reviews available.</p>
+        {% endif %}
+
+        <!-- Recommended Cars Section -->
+        <h3>Recommended Cars</h3>
+        <ul>
+            {% for model, score in recommendations %}
+                <li>{{ model }} - Similarity Score: {{ score|floatformat:2 }}</li>
+            {% endfor %}
+        </ul>
+
+        <!-- Trending Keywords Section -->
+        <h3>Trending Keywords</h3>
+        <ul>
+            {% for keyword in trending_keywords %}
+                <li>{{ keyword }}</li>
+            {% endfor %}
+        </ul>
+        <button onclick="window.location.href='{% url 'car_review_form' %}'" class="btn btn-primary">Submit a New Review</button>
+
+    </div>
+
+    <!-- Include Bootstrap Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
